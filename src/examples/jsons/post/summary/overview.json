@@ -1,0 +1,60 @@
+{
+  "totalSalesOverview": {
+    "totalSales": 1250000,
+    "monthlyGrowth": 15,
+    "topSellingProduct": "Widget X"
+  },
+  "salesByRegion": {
+    "NorthAmerica": 600000,
+    "Europe": 400000,
+    "AsiaPacific": 200000,
+    "RestOfWorld": 50000
+  },
+  "productPerformance": {
+    "WidgetX": 450000,
+    "WidgetY": 300000,
+    "WidgetZ": 200000
+  },
+  "salesChannels": {
+    "online": 800000,
+    "offline": 450000
+  },
+  "customerDemographics": {
+    "newCustomers": 1200,
+    "returningCustomers": 800,
+    "averageCustomerAge": 35,
+    "malePercentage": 55,
+    "femalePercentage": 45
+  },
+  "salesFunnel": {
+    "leads": 5000,
+    "opportunities": 1200,
+    "conversions": 800,
+    "conversionRate": 67
+  },
+  "topPerformingSalesReps": {
+    "JohnDoe": 250000,
+    "JaneSmith": 200000,
+    "MarkJohnson": 180000
+  },
+  "inventoryStatus": {
+    "totalStockValue": 350000,
+    "outOfStockItems": 5,
+    "lowStockItems": 10
+  },
+  "customerSatisfaction": {
+    "netPromoterScore": 75,
+    "customerRatings": {
+      "5stars": 65,
+      "4stars": 25,
+      "3stars": 8,
+      "2stars": 2,
+      "1star": 0
+    }
+  },
+  "financialSummary": {
+    "grossProfitMargin": 35,
+    "operatingExpenses": 150000,
+    "netProfit": 100000
+  }
+}

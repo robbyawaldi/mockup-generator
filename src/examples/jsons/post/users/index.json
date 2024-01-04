@@ -1,0 +1,42 @@
+[
+  {
+    "userId": 1,
+    "username": "john_doe",
+    "fullName": "John Doe",
+    "email": "john.doe@example.com",
+    "role": "admin",
+    "lastLogin": "2024-01-03T08:30:00"
+  },
+  {
+    "userId": 2,
+    "username": "jane_smith",
+    "fullName": "Jane Smith",
+    "email": "jane.smith@example.com",
+    "role": "manager",
+    "lastLogin": "2024-01-02T15:45:00"
+  },
+  {
+    "userId": 3,
+    "username": "mark_johnson",
+    "fullName": "Mark Johnson",
+    "email": "mark.johnson@example.com",
+    "role": "employee",
+    "lastLogin": "2024-01-03T11:20:00"
+  },
+  {
+    "userId": 4,
+    "username": "amy_wilson",
+    "fullName": "Amy Wilson",
+    "email": "amy.wilson@example.com",
+    "role": "employee",
+    "lastLogin": "2024-01-01T09:10:00"
+  },
+  {
+    "userId": 5,
+    "username": "mike_anderson",
+    "fullName": "Mike Anderson",
+    "email": "mike.anderson@example.com",
+    "role": "employee",
+    "lastLogin": "2023-12-31T18:05:00"
+  }
+]
