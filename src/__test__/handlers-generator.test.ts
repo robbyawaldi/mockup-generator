@@ -1,27 +1,15 @@
 import { test, expect } from "vitest";
-import { generateHandlers, mapFileNames } from "../handlers-generator";
+import { HttpHandlersGenerator } from "../handlers-generator";
 import prettier from "prettier";
 import config from "../prettier";
 
-test("mapFileNames should retrieve filenames based on the provided path", () => {
-  const result = mapFileNames("./src/examples/jsons");
-  expect(result).toEqual([
-    "/post/summary/overview.json",
-    "/post/users/*detail.json",
-    "/post/users/index.json",
-  ]);
-});
-
-test("generateHandlers should create handlers based on specified file paths", async () => {
-  const result = generateHandlers(
-    [
-      "/post/summary/overview.json",
-      "/post/users/*detail.json",
-      "/post/users/index.json",
-    ],
+test("generator should create handlers based on specified file paths", async () => {
+  const generator = new HttpHandlersGenerator(
+    "src/examples/jsons",
     "api",
     "src/example/jsons"
   );
+  const result = generator.generateHandlers();
   const expected = await prettier.format(
     `
 import { delay, http, HttpResponse } from 'msw'
