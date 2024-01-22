@@ -11,6 +11,7 @@ interface Files {
 
 export class OpenApiGenerator {
   private files: Files[];
+  private directoryPath: string;
   readonly header = `openapi: 3.0.0
 
 info:
@@ -25,9 +26,11 @@ paths:`;
       dir: map,
       path: map.replace(directoryPath.replace(/\.\//, ""), ""),
     }));
+    this.directoryPath = directoryPath;
   }
   async generateOpenApi() {
     let result = this.header;
+    result += "\n";
     result += this.mappingPaths();
     result += "\n";
     result += await this.mappingSchemas();
@@ -36,13 +39,16 @@ paths:`;
   private mapFileNames(directoryPath: string): string[] {
     let fileNames: string[] = [];
 
-    function traverseDirectory(currentPath: string) {
-      const files = fs.readdirSync(currentPath);
-
+    function traverseDirectory(currentPath: string, filter = true) {
+      let files = fs.readdirSync(currentPath);
+      if (filter)
+        files = files.filter((f) =>
+          ["post", "get", "delete", "patch", "put"].includes(f)
+        );
       files.forEach((file) => {
         const filePath = path.join(currentPath, file);
         if (fs.statSync(filePath).isDirectory()) {
-          traverseDirectory(filePath);
+          traverseDirectory(filePath, false);
         } else {
           fileNames.push(filePath);
         }
@@ -56,6 +62,31 @@ paths:`;
   private mappingPaths(): string {
     return this.files
       .map((file) => {
+        let requestBody: any = null;
+        try {
+          const requestFilePath = path.join(
+            this.directoryPath + "/request.config.json"
+          );
+          const requestFile = JSON.parse(
+            fs.readFileSync(requestFilePath, "utf-8")
+          );
+          const requestDataPath = path.join(
+            this.directoryPath,
+            requestFile[file.path]
+          );
+          const requestData = JSON.parse(
+            fs.readFileSync(requestDataPath, "utf-8")
+          );
+          requestBody = {
+            required: true,
+            content: {
+              "application/json": {
+                schema: this.jsonToOpenApiSchema(requestData),
+              },
+            },
+          };
+        } catch (err) {}
+
         const paths = file.path
           .split("/")
           .map((f) => f.replace(".json", ""))
@@ -68,16 +99,28 @@ paths:`;
           paths[paths.length - 1] = paths[paths.length - 1].replace("*", "");
         }
         const formattedPath = paths.map((p) => `/${p}`).join("");
-        return `  
-  ${formattedPath}:
-    ${method}:
-      responses:
-        200:
-          description: Description
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/${file.name}"`;
+        const result: any = {
+          [formattedPath]: {
+            [method ?? "post"]: {
+              responses: {
+                200: {
+                  description: "Description",
+                  content: {
+                    "application/json": {
+                      schema: {
+                        $ref: `#/components/schemas/${file.name}`,
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        };
+        if (requestBody) {
+          result[formattedPath][method ?? "post"]["requestBody"] = requestBody;
+        }
+        return YAML.stringify(result);
       })
       .join("\n");
   }

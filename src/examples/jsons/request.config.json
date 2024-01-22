@@ -1,0 +1,4 @@
+{
+  "/post/summary/overview.json": "/request/bodyRequest.json",
+  "/post/users/index.json": "/request/bodyRequest.json"
+}

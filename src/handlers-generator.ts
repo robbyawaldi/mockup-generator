@@ -32,7 +32,9 @@ export class HttpHandlersGenerator {
   : [];
   `;
   constructor(directoryPath: string, basePath: string, baseDir: string) {
-    this.fileNames = this.mapFileNames(directoryPath);
+    this.fileNames = this.mapFileNames(directoryPath).filter((f) =>
+      /(post|get|delete|put|patch)/.test(f)
+    );
     this.basePath = basePath;
     this.baseDir = baseDir;
     this.https = this.groupingHttps();
