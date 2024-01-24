@@ -12,6 +12,8 @@ interface Files {
 export class OpenApiGenerator {
   private files: Files[];
   private directoryPath: string;
+  private requestFile: any;
+  private additionalFile: any;
   readonly header = {
     openapi: "3.0.0",
     info: {
@@ -28,12 +30,31 @@ export class OpenApiGenerator {
       dir: map,
       path: map.replace(directoryPath.replace(/\.\//, ""), ""),
     }));
+
     this.directoryPath = directoryPath;
+    const requestFilePath = path.join(
+      this.directoryPath,
+      "/request.config.json"
+    );
+    const additionalFilePath = path.join(
+      this.directoryPath,
+      "/additional.config.json"
+    );
+
+    try {
+      this.requestFile = JSON.parse(fs.readFileSync(requestFilePath, "utf-8"));
+    } catch {}
+    try {
+      this.additionalFile = JSON.parse(
+        fs.readFileSync(additionalFilePath, "utf-8")
+      );
+    } catch {}
   }
   async generateOpenApi() {
     let result = this.header;
     result.paths = this.mappingPaths();
     result.components = this.mappingSchemas();
+
     return await prettier.format(YAML.stringify(result), {
       semi: false,
       singleQuote: false,
@@ -71,16 +92,10 @@ export class OpenApiGenerator {
   private mappingPaths() {
     return this.files.reduce((_paths, file) => {
       let requestBody: any = null;
-      try {
-        const requestFilePath = path.join(
-          this.directoryPath + "/request.config.json"
-        );
-        const requestFile = JSON.parse(
-          fs.readFileSync(requestFilePath, "utf-8")
-        );
+      if (this.requestFile?.[file.path]) {
         const requestDataPath = path.join(
           this.directoryPath,
-          requestFile[file.path]
+          this.requestFile[file.path]
         );
         const requestData = JSON.parse(
           fs.readFileSync(requestDataPath, "utf-8")
@@ -93,7 +108,7 @@ export class OpenApiGenerator {
             },
           },
         };
-      } catch (err) {}
+      }
 
       const paths = file.path
         .split("/")
@@ -136,7 +151,8 @@ export class OpenApiGenerator {
       schemas: this.files.reduce((schemas, file) => {
         const data = fs.readFileSync(file.dir, "utf-8");
         (schemas as any)[file.name] = this.jsonToOpenApiSchema(
-          JSON.parse(data)
+          JSON.parse(data),
+          this.additionalFile?.[file.path]
         );
         return schemas;
       }, {}),
@@ -156,35 +172,52 @@ export class OpenApiGenerator {
     }
     return fileName;
   }
-  private jsonToOpenApiSchema(jsonData: any) {
-    function parseObject(obj: any) {
+  private jsonToOpenApiSchema(jsonData: any, dynamicProperties: string[] = []) {
+    function parseObject(obj: any, prevProperty: string) {
       const properties: any = {};
+      let additionalProperties: any = null;
       for (const [key, value] of Object.entries(obj)) {
-        properties[key] = parseValue(value);
+        const chainProperties = `${
+          prevProperty ? `${prevProperty}.` : ""
+        }${key}`;
+        if (dynamicProperties.includes(chainProperties)) {
+          additionalProperties = parseValue(value, chainProperties);
+          break;
+        }
+        properties[key] = parseValue(value, chainProperties);
       }
       if (Object.entries(obj).length < 1) {
         properties["name"] = {
           type: "string",
         };
       }
-      return { type: "object", properties: properties };
+      const result: any = { type: "object" };
+      if (additionalProperties) {
+        result["additionalProperties"] = additionalProperties;
+      } else {
+        result["properties"] = properties;
+      }
+      return result;
     }
 
-    function parseArray(arr: any[]) {
-      const items: any = arr.length ? parseValue(arr[0]) : { type: "string" };
+    function parseArray(arr: any[], prevProperty: string) {
+      const items: any = arr.length
+        ? parseValue(arr[0], prevProperty)
+        : { type: "string" };
       return { type: "array", items: items };
     }
 
-    function parseValue(value: any) {
+    function parseValue(value: any, prevProperty: string) {
       if (Array.isArray(value)) {
-        return parseArray(value);
+        return parseArray(value, prevProperty);
       } else if (typeof value === "object" && value !== null) {
-        return parseObject(value);
+        return parseObject(value, prevProperty);
       } else {
         return { type: typeof value };
       }
     }
 
-    return parseValue(jsonData);
+    const result = parseValue(jsonData, "");
+    return result;
   }
 }

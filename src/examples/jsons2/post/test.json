@@ -1,0 +1,22 @@
+{
+  "data": {
+    "summary": {
+      "additional1": [
+        {
+          "name": "test1"
+        },
+        {
+          "name": "test2"
+        }
+      ],
+      "additional2": [
+        {
+          "name": "test1"
+        },
+        {
+          "name": "test2"
+        }
+      ]
+    }
+  }
+}

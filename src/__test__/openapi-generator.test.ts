@@ -202,3 +202,44 @@ components:
   `.replace(/\s/g, "")
   );
 });
+
+test("generate should create openapi with additionalProperties", async () => {
+  const generator = new OpenApiGenerator("src/examples/jsons2");
+  const result = await generator.generateOpenApi();
+  expect(result.replace(/\s/g, "")).toBe(
+    `
+    openapi: "3.0.0"
+info:
+  title: "API Specification"
+  description: "API Specification"
+  version: "1.0.0"
+paths:
+  /test:
+    post:
+      responses:
+        200:
+          description: "Description"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/test"
+components:
+  schemas:
+    test:
+      type: "object"
+      properties:
+        data:
+          type: "object"
+          properties:
+            summary:
+              type: "object"
+              additionalProperties:
+                type: "array"
+                items:
+                  type: "object"
+                  properties:
+                    name:
+                      type: "string"
+    `.replace(/\s/g, "")
+  );
+});

@@ -37,9 +37,7 @@ program
     const openapi = await generator.generateOpenApi();
     try {
       fs.writeFileSync(output, openapi, "utf-8");
-    } catch (err) {
-      console.log(err);
-    }
+    } catch (err) {}
   });
 
 program.parse(process.argv);
