@@ -1,0 +1,8 @@
+{
+  "/get/books.json": [
+    {
+      "name": "category",
+      "type": "string"
+    }
+  ]
+}

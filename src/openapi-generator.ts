@@ -14,6 +14,7 @@ export class OpenApiGenerator {
   private directoryPath: string;
   private requestFile: any;
   private additionalFile: any;
+  private paramsFile: any;
   readonly header = {
     openapi: "3.0.0",
     info: {
@@ -25,13 +26,14 @@ export class OpenApiGenerator {
     components: {},
   };
   constructor(directoryPath: string) {
+    this.directoryPath = directoryPath;
+
     this.files = this.mapFileNames(directoryPath).map((map) => ({
       name: this.createSchemaName(map),
       dir: map,
       path: map.replace(directoryPath.replace(/\.\//, ""), ""),
     }));
 
-    this.directoryPath = directoryPath;
     const requestFilePath = path.join(
       this.directoryPath,
       "/request.config.json"
@@ -40,7 +42,7 @@ export class OpenApiGenerator {
       this.directoryPath,
       "/additional.config.json"
     );
-
+    const paramsFilePath = path.join(this.directoryPath, "/params.config.json");
     try {
       this.requestFile = JSON.parse(fs.readFileSync(requestFilePath, "utf-8"));
     } catch {}
@@ -48,6 +50,9 @@ export class OpenApiGenerator {
       this.additionalFile = JSON.parse(
         fs.readFileSync(additionalFilePath, "utf-8")
       );
+    } catch {}
+    try {
+      this.paramsFile = JSON.parse(fs.readFileSync(paramsFilePath, "utf-8"));
     } catch {}
   }
   async generateOpenApi() {
@@ -110,6 +115,20 @@ export class OpenApiGenerator {
         };
       }
 
+      let params: any = null;
+      const paramArr: any[] | undefined = this.paramsFile?.[file.path];
+      if (paramArr) {
+        params = paramArr.map((p) => ({
+          name: p.name,
+          in: "query",
+          description: "",
+          required: false,
+          schema: {
+            type: p.type,
+          },
+        }));
+      }
+
       const paths = file.path
         .split("/")
         .map((f) => f.replace(".json", ""))
@@ -143,6 +162,9 @@ export class OpenApiGenerator {
       if (requestBody) {
         result[formattedPath][method ?? "post"]["requestBody"] = requestBody;
       }
+      if (paramArr) {
+        result[formattedPath][method ?? "post"]["parameters"] = params;
+      }
       return { ..._paths, ...result };
     }, {});
   }
@@ -159,17 +181,22 @@ export class OpenApiGenerator {
     };
   }
   private createSchemaName(filePath: string) {
-    let fileName = filePath.replace(".json", "");
+    let fileName = filePath
+      .replace(this.directoryPath, "")
+      .replace(".json", "")
+      .replace("*", "")
+      .replace("/index", "");
     const pathComponents = fileName.split("/");
-    const lastPathComponent = pathComponents[pathComponents.length - 1];
 
-    fileName = lastPathComponent.includes("*")
-      ? lastPathComponent.replace("*", "")
-      : lastPathComponent;
-    if (fileName === "index") {
-      const secondLastPathComponent = pathComponents[pathComponents.length - 2];
-      fileName = secondLastPathComponent;
-    }
+    fileName = pathComponents
+      .map((item, index) => {
+        if (index > 1) {
+          return item?.[0]?.toUpperCase() + item?.slice(1);
+        }
+        return item;
+      })
+      .join("");
+
     return fileName;
   }
   private jsonToOpenApiSchema(jsonData: any, dynamicProperties: string[] = []) {
