@@ -14,6 +14,7 @@ export class HttpHandlersGenerator {
   private basePath: string;
   private baseDir: string;
   private https: Https;
+  private directoryPath: string;
   readonly importTemplate = `
   import { delay, http, HttpResponse } from "msw";
   `;
@@ -32,6 +33,7 @@ export class HttpHandlersGenerator {
   : [];
   `;
   constructor(directoryPath: string, basePath: string, baseDir: string) {
+    this.directoryPath = directoryPath;
     this.fileNames = this.mapFileNames(directoryPath).filter((f) =>
       /(post|get|delete|put|patch)/.test(f)
     );
@@ -91,10 +93,12 @@ export class HttpHandlersGenerator {
         const http${
           httpMethod[0].toUpperCase() + httpMethod.slice(1)
         } = {${this.https[httpMethod]
-          .map(
-            (_path) =>
-              `"${this.generatePath(_path.path)}": await import("${_path.dir}")`
-          )
+          .map((_path) => {
+            const name = this.createSchemaName(
+              _path.path.replace(this.basePath, "")
+            );
+            return `"${this.generatePath(_path.path)}": ${name}`;
+          })
           .join(",")}};`;
     }
 
@@ -106,8 +110,42 @@ export class HttpHandlersGenerator {
 
     return result;
   }
+  private mappingImports(): string {
+    let result = Object.keys(this.https)
+      .flatMap((http) =>
+        this.https[http].map((item) => {
+          const name = this.createSchemaName(
+            item.path.replace(this.basePath, "")
+          );
+          return `import ${name} from "${item.dir}"`;
+        })
+      )
+      .join(";\n");
+    return result;
+  }
+  private createSchemaName(filePath: string) {
+    let fileName = filePath
+      .replace(this.directoryPath.replace("./", ""), "")
+      .replace(".json", "")
+      .replace("*", "")
+      .replace("/index", "");
+    const pathComponents = fileName.split("/");
+
+    fileName = pathComponents
+      .map((item, index) => {
+        if (index > 1) {
+          return item?.[0]?.toUpperCase() + item?.slice(1);
+        }
+        return item;
+      })
+      .join("");
+
+    return fileName;
+  }
   public generateHandlers(): string {
-    let result = this.importTemplate;
+    let result = this.mappingImports();
+    result += "\n\n";
+    result += this.importTemplate;
     result += this.mappingHttpMethods();
     result += this.handlersTemplate;
     return result;

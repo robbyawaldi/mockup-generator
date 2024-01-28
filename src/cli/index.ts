@@ -5,6 +5,25 @@ import prettier from "prettier";
 import config from "../prettier";
 import { OpenApiGenerator } from "../openapi-generator";
 
+const headerHandlers = `
+/*
+ * ---------------------------------------------------------------
+ * ## THIS FILE WAS GENERATED VIA MOCKUP-GENERATOR              ##
+ * ##                                                           ##
+ * ## AUTHOR: robbyawaldi                                       ##
+ * ## SOURCE: https://github.com/robbyawaldi/mockup-generator   ##
+ * ---------------------------------------------------------------
+ */\n\n
+`;
+const headerOpenApi = `
+# ---------------------------------------------------------------
+# THIS FILE WAS GENERATED VIA MOCKUP-GENERATOR             
+#                                                            
+# AUTHOR: robbyawaldi                                       
+# SOURCE: https://github.com/robbyawaldi/mockup-generator   
+# ---------------------------------------------------------------\n\n
+`;
+
 program
   .command("gen:handlers")
   .description("Generate the Handlers File")
@@ -19,7 +38,7 @@ program
     const handlers = generator.generateHandlers();
     const formatted = await prettier.format(handlers, config);
     try {
-      fs.writeFileSync(output, formatted, "utf-8");
+      fs.writeFileSync(output, headerHandlers + formatted, "utf-8");
     } catch (err) {
       console.error(err);
     }
@@ -36,7 +55,7 @@ program
     const generator = new OpenApiGenerator(dir);
     const openapi = await generator.generateOpenApi();
     try {
-      fs.writeFileSync(output, openapi, "utf-8");
+      fs.writeFileSync(output, headerOpenApi + openapi, "utf-8");
     } catch (err) {}
   });
 

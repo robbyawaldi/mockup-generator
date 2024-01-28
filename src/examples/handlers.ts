@@ -1,10 +1,26 @@
+
+/*
+ * ---------------------------------------------------------------
+ * ## THIS FILE WAS GENERATED VIA MOCKUP-GENERATOR              ##
+ * ##                                                           ##
+ * ## AUTHOR: robbyawaldi                                       ##
+ * ## SOURCE: https://github.com/robbyawaldi/mockup-generator   ##
+ * ---------------------------------------------------------------
+ */
+
+
+import books from './jsons/get/books.json'
+import summaryOverview from './jsons/post/summary/overview.json'
+import usersDetail from './jsons/post/users/*detail.json'
+import users from './jsons/post/users/index.json'
+
 import { delay, http, HttpResponse } from 'msw'
 
-const httpGet = {}
+const httpGet = { 'api/books': books }
 const httpPost = {
-  'api/summary/overview': await import('./jsons/post/summary/overview.json'),
-  'api/users/*': await import('./jsons/post/users/*detail.json'),
-  'api/users': await import('./jsons/post/users/index.json'),
+  'api/summary/overview': summaryOverview,
+  'api/users/*': usersDetail,
+  'api/users': users,
 }
 const httpPut = {}
 const httpPatch = {}

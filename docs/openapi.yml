@@ -1,3 +1,12 @@
+
+# ---------------------------------------------------------------
+# THIS FILE WAS GENERATED VIA MOCKUP-GENERATOR             
+#                                                            
+# AUTHOR: robbyawaldi                                       
+# SOURCE: https://github.com/robbyawaldi/mockup-generator   
+# ---------------------------------------------------------------
+
+
 openapi: "3.0.0"
 info:
   title: "API Specification"
