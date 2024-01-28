@@ -182,8 +182,7 @@ export class OpenApiGenerator {
   }
   private createSchemaName(filePath: string) {
     let fileName = filePath
-      .replace("./", "")
-      .replace(this.directoryPath, "")
+      .replace(this.directoryPath.replace("./", ""), "")
       .replace(".json", "")
       .replace("*", "")
       .replace("/index", "");

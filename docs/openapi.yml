@@ -4,6 +4,22 @@ info:
   description: "API Specification"
   version: "1.0.0"
 paths:
+  /books:
+    get:
+      responses:
+        200:
+          description: "Description"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/getBooks"
+      parameters:
+        - name: "category"
+          in: "query"
+          description: ""
+          required: false
+          schema:
+            type: "string"
   /summary/overview:
     post:
       responses:
@@ -12,7 +28,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/overview"
+                $ref: "#/components/schemas/postSummaryOverview"
       requestBody:
         required: true
         content:
@@ -30,7 +46,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/detail"
+                $ref: "#/components/schemas/postUsersDetail"
   /users:
     post:
       responses:
@@ -39,7 +55,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/users"
+                $ref: "#/components/schemas/postUsers"
       requestBody:
         required: true
         content:
@@ -51,7 +67,18 @@ paths:
                   type: "string"
 components:
   schemas:
-    overview:
+    getBooks:
+      type: "array"
+      items:
+        type: "object"
+        properties:
+          name:
+            type: "string"
+          year:
+            type: "string"
+          publisher:
+            type: "string"
+    postSummaryOverview:
       type: "object"
       properties:
         totalSalesOverview:
@@ -159,7 +186,7 @@ components:
               type: "number"
             netProfit:
               type: "number"
-    detail:
+    postUsersDetail:
       type: "object"
       properties:
         userId:
@@ -174,7 +201,7 @@ components:
           type: "string"
         lastLogin:
           type: "string"
-    users:
+    postUsers:
       type: "array"
       items:
         type: "object"

@@ -1,6 +1,6 @@
 {
   "name": "@robbyawaldi/mockup-generator",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "bin": {
     "mockup-generator": "dist/cli/index.cjs"
   },
@@ -12,7 +12,8 @@
   },
   "scripts": {
     "test": "vitest",
-    "build": "rollup -c --bundleConfigAsCjs"
+    "build": "rollup -c --bundleConfigAsCjs",
+    "gen:openapi": "node dist/cli/index.cjs gen:openapi -d ./src/examples/jsons -o ./docs/openapi.yml"
   },
   "keywords": [],
   "author": "",
