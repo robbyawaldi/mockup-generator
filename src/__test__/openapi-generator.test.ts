@@ -12,7 +12,7 @@ test("generator should create openapi", async () => {
       description: "API Specification"
       version: "1.0.0"
     paths:
-      /books:
+      /book-list:
         get:
           responses:
             200:
@@ -20,14 +20,7 @@ test("generator should create openapi", async () => {
               content:
                 application/json:
                   schema:
-                    $ref: "#/components/schemas/getBooks"
-          parameters:
-            - name: "category"
-              in: "query"
-              description: ""
-              required: false
-              schema:
-                type: "string"
+                    $ref: "#/components/schemas/getBookList"
       /summary/overview:
         post:
           responses:
@@ -75,7 +68,7 @@ test("generator should create openapi", async () => {
                       type: "string"
     components:
       schemas:
-        getBooks:
+        getBookList:
           type: "array"
           items:
             type: "object"

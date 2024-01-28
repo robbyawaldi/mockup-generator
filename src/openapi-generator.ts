@@ -186,6 +186,10 @@ export class OpenApiGenerator {
       .replace(".json", "")
       .replace("*", "")
       .replace("/index", "");
+
+    // Convert kebab case to camelCase
+    fileName = fileName.replace(/-([a-z])/g, (_, char) => char.toUpperCase());
+
     const pathComponents = fileName.split("/");
 
     fileName = pathComponents
