@@ -1,6 +1,6 @@
 {
   "name": "@robbyawaldi/mockup-generator",
-  "version": "1.5.0",
+  "version": "1.5.1",
   "bin": {
     "mockup-generator": "dist/cli/index.cjs"
   },
@@ -14,7 +14,7 @@
     "test": "vitest",
     "build": "rollup -c --bundleConfigAsCjs",
     "gen:openapi": "node dist/cli/index.cjs gen:openapi -d ./src/examples/jsons -o ./docs/openapi.yml",
-    "gen:mockup": "node dist/cli/index.cjs gen:handlers -d ./src/examples/jsons -o ./src/examples/handlers.ts"
+    "gen:mockup": "node dist/cli/index.cjs gen:handlers -d ./src/examples/jsons -o ./src/examples/handlers.ts --delay 100"
   },
   "keywords": [],
   "author": "",

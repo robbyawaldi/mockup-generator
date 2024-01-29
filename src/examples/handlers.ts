@@ -37,7 +37,7 @@ export const handlers = import.meta.env.DEV
       ...https.flatMap((h) =>
         Object.keys(h.http).map((route) => {
           return (http as any)[h.method](route, async () => {
-            await delay(0)
+            await delay(100)
             return HttpResponse.json(h.http[route as keyof typeof h.http])
           })
         }),
