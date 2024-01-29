@@ -7,7 +7,8 @@ test("generator should create handlers based on specified file paths", async () 
   const generator = new HttpHandlersGenerator(
     "src/examples/jsons",
     "api",
-    "src/example/jsons"
+    "src/example/jsons",
+    "0"
   );
   const result = generator.generateHandlers();
   const expected = await prettier.format(
@@ -30,7 +31,7 @@ test("generator should create handlers based on specified file paths", async () 
         ...https.flatMap((h) =>
           Object.keys(h.http).map((route) => {
             return (http as any)[h.method](route, async () => {
-              await delay(1000);
+              await delay(0);
               return HttpResponse.json(h.http[route as keyof typeof h.http]);
             });
           })

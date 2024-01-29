@@ -30,11 +30,13 @@ program
   .requiredOption("-d, --dir <string>", "Mockup JSON Location")
   .option("-b, --base <string>", "Base Path API", "api")
   .option("-o, --output <string>", "File Name", "handlers.ts")
+  .option("-d, --delay <number>", "Delay Response", "0")
   .action(async (options) => {
     const dir = options.dir;
     const base = options.base;
     const output = options.output;
-    const generator = new HttpHandlersGenerator(dir, base, dir);
+    const delay = options.delay;
+    const generator = new HttpHandlersGenerator(dir, base, dir, delay);
     const handlers = generator.generateHandlers();
     const formatted = await prettier.format(handlers, config);
     try {

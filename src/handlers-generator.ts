@@ -18,21 +18,27 @@ export class HttpHandlersGenerator {
   readonly importTemplate = `
   import { delay, http, HttpResponse } from "msw";
   `;
-  readonly handlersTemplate = `
-  export const handlers = import.meta.env.DEV
-  ? [
-    ...https.flatMap((h) =>
-      Object.keys(h.http).map((route) => {
-        return (http as any)[h.method](route, async () => {
-          await delay(1000);
-          return HttpResponse.json(h.http[route as keyof typeof h.http]);
-        });
-      })
-    ),
-  ]
-  : [];
-  `;
-  constructor(directoryPath: string, basePath: string, baseDir: string) {
+  private handlersTemplate: string;
+  constructor(
+    directoryPath: string,
+    basePath: string,
+    baseDir: string,
+    delay: string
+  ) {
+    this.handlersTemplate = `
+    export const handlers = import.meta.env.DEV
+    ? [
+      ...https.flatMap((h) =>
+        Object.keys(h.http).map((route) => {
+          return (http as any)[h.method](route, async () => {
+            await delay(${delay});
+            return HttpResponse.json(h.http[route as keyof typeof h.http]);
+          });
+        })
+      ),
+    ]
+    : [];
+    `;
     this.directoryPath = directoryPath;
     this.fileNames = this.mapFileNames(directoryPath).filter((f) =>
       /(post|get|delete|put|patch)/.test(f)
