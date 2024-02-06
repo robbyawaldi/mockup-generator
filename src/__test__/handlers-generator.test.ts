@@ -1,7 +1,6 @@
 // Copyright 1999-2024. Plesk International GmbH. All rights reserved.
 
 import { test, expect } from "vitest";
-import { HttpHandlersGenerator } from "../handlers-generator";
 import prettier from "prettier";
 import config from "../prettier";
 import { HttpHandlersGeneratorWindows } from "src/handlers-generator-windows";
@@ -44,5 +43,5 @@ test("generator should create handlers based on specified file paths", async () 
   `,
     config
   );
-  // expect(await prettier.format(result, config)).toBe(expected);
+  expect(await prettier.format(result, config)).toBe(expected);
 });
