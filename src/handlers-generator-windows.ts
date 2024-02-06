@@ -1,3 +1,5 @@
+// Copyright 1999-2024. Plesk International GmbH. All rights reserved.
+
 import fs from "fs";
 import path from "path";
 
@@ -43,7 +45,6 @@ export class HttpHandlersGeneratorWindows {
     this.fileNames = this.mapFileNames(directoryPath).filter((f) =>
       /(post|get|delete|put|patch)/.test(f)
     );
-    console.log(this.fileNames);
 
     this.basePath = basePath;
     this.baseDir = baseDir;
@@ -61,7 +62,9 @@ export class HttpHandlersGeneratorWindows {
           traverseDirectory(filePath);
         } else {
           fileNames.push(
-            filePath.replace(directoryPath.replace(/[\\/]/, ""), "")
+            filePath
+              .replace(directoryPath.replace(/\//g, "\\"), "")
+              .replace("\\", "")
           );
         }
       });
@@ -82,16 +85,23 @@ export class HttpHandlersGeneratorWindows {
 
     for (const fileName of this.fileNames) {
       const paths = fileName.split(/[\\/]/).filter((f) => f !== "");
+
       const httpMethod = paths[0];
+
       https[httpMethod]?.push({
         path: path.join(this.basePath, paths.slice(1).join("/")),
         dir: `.${path.sep}${this.baseDir.split(/[\\/]/).pop()}${fileName}`,
       });
     }
+
     return https;
   }
   private generatePath(path: string): string {
-    return path.replace(".json", "").replace("/index", "").replace(/\*.+/, "*");
+    return path
+      .replace(".json", "")
+      .replace("/index", "")
+      .replace(/\*.+/, "*")
+      .replace(/\\/g, "/");
   }
   private mappingHttpMethods(): string {
     let result = "";
@@ -159,6 +169,7 @@ export class HttpHandlersGeneratorWindows {
     result += "\n\n";
     result += this.importTemplate;
     result += this.mappingHttpMethods();
+
     result += this.handlersTemplate;
     return result;
   }
