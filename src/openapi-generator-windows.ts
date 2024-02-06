@@ -9,7 +9,7 @@ interface Files {
   path: string;
 }
 
-export class OpenApiGenerator {
+export class OpenApiGeneratorWindows {
   private files: Files[];
   private directoryPath: string;
   private requestFile: any;
@@ -31,18 +31,18 @@ export class OpenApiGenerator {
     this.files = this.mapFileNames(directoryPath).map((map) => ({
       name: this.createSchemaName(map),
       dir: map,
-      path: map.replace(directoryPath.replace(/\.\//, ""), ""),
+      path: map.replace(path.resolve(directoryPath).replace(/[\\/]/g, "/"), ""),
     }));
 
     const requestFilePath = path.join(
       this.directoryPath,
-      "/request.config.json"
+      "request.config.json"
     );
     const additionalFilePath = path.join(
       this.directoryPath,
-      "/additional.config.json"
+      "additional.config.json"
     );
-    const paramsFilePath = path.join(this.directoryPath, "/params.config.json");
+    const paramsFilePath = path.join(this.directoryPath, "params.config.json");
     try {
       this.requestFile = JSON.parse(fs.readFileSync(requestFilePath, "utf-8"));
     } catch {}
@@ -182,7 +182,7 @@ export class OpenApiGenerator {
   }
   private createSchemaName(filePath: string) {
     let fileName = filePath
-      .replace(this.directoryPath.replace("./", ""), "")
+      .replace(path.resolve(this.directoryPath).replace(/[\\/]/g, "/"), "")
       .replace(".json", "")
       .replace("*", "")
       .replace("/index", "");

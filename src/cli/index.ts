@@ -4,6 +4,9 @@ import fs from "fs";
 import prettier from "prettier";
 import config from "../prettier";
 import { OpenApiGenerator } from "../openapi-generator";
+import os from "os";
+import { OpenApiGeneratorWindows } from "../openapi-generator-windows";
+import { HttpHandlersGeneratorWindows } from "../handlers-generator-windows";
 
 const headerHandlers = `
 /*
@@ -36,7 +39,12 @@ program
     const base = options.base;
     const output = options.output;
     const delay = options.delay;
-    const generator = new HttpHandlersGenerator(dir, base, dir, delay);
+    let generator;
+    if (os.platform() === "win32") {
+      generator = new HttpHandlersGeneratorWindows(dir, base, dir, delay);
+    } else {
+      generator = new HttpHandlersGenerator(dir, base, dir, delay);
+    }
     const handlers = generator.generateHandlers();
     const formatted = await prettier.format(handlers, config);
     try {
@@ -54,7 +62,12 @@ program
   .action(async (options) => {
     const dir = options.dir;
     const output = options.output;
-    const generator = new OpenApiGenerator(dir);
+    let generator;
+    if (os.platform() === "win32") {
+      generator = new OpenApiGeneratorWindows(dir);
+    } else {
+      generator = new OpenApiGenerator(dir);
+    }
     const openapi = await generator.generateOpenApi();
     try {
       fs.writeFileSync(output, headerOpenApi + openapi, "utf-8");
