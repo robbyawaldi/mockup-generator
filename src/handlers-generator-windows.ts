@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-const convertPath = require( '@stdlib/utils-convert-path' );
+const convertPath = require("@stdlib/utils-convert-path");
 
 type Https = Record<
   string,
@@ -43,7 +43,7 @@ export class HttpHandlersGeneratorWindows {
     this.directoryPath = directoryPath;
     this.fileNames = this.mapFileNames(directoryPath).filter((f) =>
       /(post|get|delete|put|patch)/.test(f)
-    );    
+    );
     this.basePath = basePath;
     this.baseDir = baseDir;
     this.https = this.groupingHttps();
@@ -57,7 +57,7 @@ export class HttpHandlersGeneratorWindows {
       files.forEach((file) => {
         const filePath = path.join(currentPath, file);
         const convertFilePath = convertPath(filePath, "posix");
-        
+
         if (fs.statSync(filePath).isDirectory()) {
           traverseDirectory(filePath);
         } else {
@@ -85,15 +85,21 @@ export class HttpHandlersGeneratorWindows {
       const paths = fileName.split("/").filter((f) => f !== "");
       const httpMethod = paths[0];
       https[httpMethod]?.push({
-        path: convertPath(path.join(this.basePath, paths.slice(1).join("/")), "posix"),
-        dir: convertPath(`.${path.sep}${this.baseDir.split("/").pop()}${fileName}`, "win32"),
+        path: convertPath(
+          path.join(this.basePath, paths.slice(1).join("/")),
+          "posix"
+        ),
+        dir: convertPath(
+          `.${path.sep}${this.baseDir.split("/").pop()}${fileName}`,
+          "win32"
+        ),
       });
     }
-    
+
     return https;
   }
   private generatePath(path: string): string {
-    return path.replace(".json", "").replace("/index", "").replace(/\*.+/, "*");
+    return path.replace(".json", "").replace("/index", "").replace(/\#.+/, "*");
   }
   private mappingHttpMethods(): string {
     let result = "";
@@ -107,7 +113,8 @@ export class HttpHandlersGeneratorWindows {
             const name = this.createSchemaName(
               _path.path.replace(this.basePath, "")
             );
-            return `"${this.generatePath(_path.path)}": ${name}`;
+            const key = this.generatePath(_path.path);
+            return `"${key}": ${name}`;
           })
           .join(",")}};`;
     }
@@ -127,12 +134,12 @@ export class HttpHandlersGeneratorWindows {
           const name = this.createSchemaName(
             item.path.replace(this.basePath, "")
           );
-          const dir = convertPath(item.dir, "posix")
+          const dir = convertPath(item.dir, "posix");
           return `import ${name} from "${dir}"`;
         })
       )
       .join(";\n");
-      
+
     return result;
   }
   private createSchemaName(filePath: string) {

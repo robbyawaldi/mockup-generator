@@ -1,6 +1,6 @@
 {
   "name": "@robbyawaldi/mockup-generator",
-  "version": "1.5.4",
+  "version": "2.0.0",
   "bin": {
     "mockup-generator": "dist/cli/index.cjs"
   },

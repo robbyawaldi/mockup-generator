@@ -89,7 +89,7 @@ export class HttpHandlersGenerator {
     return https;
   }
   private generatePath(path: string): string {
-    return path.replace(".json", "").replace("/index", "").replace(/\*.+/, "*");
+    return path.replace(".json", "").replace("/index", "").replace(/\#.+/, "*");
   }
   private mappingHttpMethods(): string {
     let result = "";
@@ -103,7 +103,8 @@ export class HttpHandlersGenerator {
             const name = this.createSchemaName(
               _path.path.replace(this.basePath, "")
             );
-            return `"${this.generatePath(_path.path)}": ${name}`;
+            const key = this.generatePath(_path.path);
+            return `"${key}": ${name}`;
           })
           .join(",")}};`;
     }

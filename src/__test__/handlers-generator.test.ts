@@ -16,7 +16,7 @@ test("generator should create handlers based on specified file paths", async () 
       "0"
     );
   } else {
-     generator = new HttpHandlersGenerator(
+    generator = new HttpHandlersGenerator(
       "src/examples/jsons",
       "api",
       "src/example/jsons",
@@ -28,14 +28,14 @@ test("generator should create handlers based on specified file paths", async () 
     `
     import bookList from "./jsons/get/book-list.json";
     import summaryOverview from "./jsons/post/summary/overview.json";
-    import usersDetail from "./jsons/post/users/detail.json";
+    import usersDetail from "./jsons/post/users/#detail.json";
     import users from "./jsons/post/users/index.json"
     
     
       import { delay, http, HttpResponse } from "msw";
       
             const httpGet = {"api/book-list": bookList};
-            const httpPost = {"api/summary/overview": summaryOverview,"api/users/detail": usersDetail,"api/users": users};
+            const httpPost = {"api/summary/overview": summaryOverview,"api/users/*": usersDetail,"api/users": users};
             const httpPut = {};
             const httpPatch = {};
             const httpDelete = {};const https = [{method: "get",http: httpGet},{method: "post",http: httpPost},{method: "put",http: httpPut},{method: "patch",http: httpPatch},{method: "delete",http: httpDelete}];
