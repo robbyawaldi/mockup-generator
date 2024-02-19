@@ -36,6 +36,7 @@
     "prettier": "^3.1.1"
   },
   "dependencies": {
+    "@stdlib/utils-convert-path": "^0.2.0",
     "commander": "^11.1.0",
     "json-to-pretty-yaml": "^1.2.2"
   }

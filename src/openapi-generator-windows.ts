@@ -3,6 +3,9 @@ import path from "path";
 import YAML from "json-to-pretty-yaml";
 import prettier from "prettier";
 
+const convertPath = require( '@stdlib/utils-convert-path' );
+
+
 interface Files {
   name: string;
   dir: string;
@@ -31,18 +34,18 @@ export class OpenApiGeneratorWindows {
     this.files = this.mapFileNames(directoryPath).map((map) => ({
       name: this.createSchemaName(map),
       dir: map,
-      path: map.replace(path.resolve(directoryPath).replace(/[\\/]/g, "/"), ""),
+      path: map.replace(directoryPath.replace(/\.\//, ""), ""),
     }));
-
+    
     const requestFilePath = path.join(
       this.directoryPath,
-      "request.config.json"
+      "/request.config.json"
     );
     const additionalFilePath = path.join(
       this.directoryPath,
-      "additional.config.json"
+      "/additional.config.json"
     );
-    const paramsFilePath = path.join(this.directoryPath, "params.config.json");
+    const paramsFilePath = path.join(this.directoryPath, "/params.config.json");
     try {
       this.requestFile = JSON.parse(fs.readFileSync(requestFilePath, "utf-8"));
     } catch {}
@@ -54,6 +57,7 @@ export class OpenApiGeneratorWindows {
     try {
       this.paramsFile = JSON.parse(fs.readFileSync(paramsFilePath, "utf-8"));
     } catch {}
+    
   }
   async generateOpenApi() {
     let result = this.header;
@@ -82,10 +86,12 @@ export class OpenApiGeneratorWindows {
         );
       files.forEach((file) => {
         const filePath = path.join(currentPath, file);
+        const convertFilePath = convertPath(filePath, "posix");
+
         if (fs.statSync(filePath).isDirectory()) {
           traverseDirectory(filePath, false);
         } else {
-          fileNames.push(filePath);
+          fileNames.push(convertFilePath);
         }
       });
     }
@@ -137,8 +143,8 @@ export class OpenApiGeneratorWindows {
       if (paths[paths.length - 1] === "index") {
         paths.pop();
       }
-      if (paths[paths.length - 1]?.includes("*")) {
-        paths[paths.length - 1] = paths[paths.length - 1].replace("*", "");
+      if (paths[paths.length - 1]?.includes("#")) {
+        paths[paths.length - 1] = paths[paths.length - 1].replace("#", "");
       }
       const formattedPath = paths.map((p) => `/${p}`).join("");
       const result: any = {
@@ -182,9 +188,9 @@ export class OpenApiGeneratorWindows {
   }
   private createSchemaName(filePath: string) {
     let fileName = filePath
-      .replace(path.resolve(this.directoryPath).replace(/[\\/]/g, "/"), "")
+      .replace(this.directoryPath.replace("./", ""), "")
       .replace(".json", "")
-      .replace("*", "")
+      .replace("#", "")
       .replace("/index", "");
 
     // Convert kebab case to camelCase

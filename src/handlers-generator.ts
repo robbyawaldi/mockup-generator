@@ -133,7 +133,7 @@ export class HttpHandlersGenerator {
     let fileName = filePath
       .replace(this.directoryPath.replace("./", ""), "")
       .replace(".json", "")
-      .replace("*", "")
+      .replace("#", "")
       .replace("/index", "");
 
     // Convert kebab case to camelCase

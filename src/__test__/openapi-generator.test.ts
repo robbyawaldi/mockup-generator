@@ -1,8 +1,15 @@
 import { expect, test } from "vitest";
 import { OpenApiGenerator } from "../openapi-generator";
+import os from "os"
+import { OpenApiGeneratorWindows } from "src/openapi-generator-windows";
 
-test.skip("generator should create openapi", async () => {
-  const generator = new OpenApiGenerator("src/examples/jsons");
+test("generator should create openapi", async () => {
+  let generator = null
+  if (os.platform()=== "win32") {
+    generator = new OpenApiGeneratorWindows("src/examples/jsons")
+  } else {
+    generator = new OpenApiGenerator("src/examples/jsons");
+  }
   const result = await generator.generateOpenApi();
   expect(result.replace(/\s/g, "")).toBe(
     `
@@ -223,8 +230,13 @@ test.skip("generator should create openapi", async () => {
   );
 });
 
-test.skip("generate should create openapi with additionalProperties", async () => {
-  const generator = new OpenApiGenerator("src/examples/jsons2");
+test("generate should create openapi with additionalProperties", async () => {
+  let generator = null
+  if (os.platform()=== "win32") {
+    generator = new OpenApiGeneratorWindows("src/examples/jsons2")
+  } else {
+    generator = new OpenApiGenerator("src/examples/jsons2");
+  }
   const result = await generator.generateOpenApi();
 
   expect(result.replace(/\s/g, "")).toBe(

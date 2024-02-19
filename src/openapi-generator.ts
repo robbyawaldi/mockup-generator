@@ -137,8 +137,8 @@ export class OpenApiGenerator {
       if (paths[paths.length - 1] === "index") {
         paths.pop();
       }
-      if (paths[paths.length - 1]?.includes("*")) {
-        paths[paths.length - 1] = paths[paths.length - 1].replace("*", "");
+      if (paths[paths.length - 1]?.includes("#")) {
+        paths[paths.length - 1] = paths[paths.length - 1].replace("#", "");
       }
       const formattedPath = paths.map((p) => `/${p}`).join("");
       const result: any = {
@@ -184,7 +184,7 @@ export class OpenApiGenerator {
     let fileName = filePath
       .replace(this.directoryPath.replace("./", ""), "")
       .replace(".json", "")
-      .replace("*", "")
+      .replace("#", "")
       .replace("/index", "");
 
     // Convert kebab case to camelCase

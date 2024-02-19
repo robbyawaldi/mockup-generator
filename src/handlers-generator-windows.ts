@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+const convertPath = require( '@stdlib/utils-convert-path' );
 
 type Https = Record<
   string,
@@ -42,8 +43,7 @@ export class HttpHandlersGeneratorWindows {
     this.directoryPath = directoryPath;
     this.fileNames = this.mapFileNames(directoryPath).filter((f) =>
       /(post|get|delete|put|patch)/.test(f)
-    );
-
+    );    
     this.basePath = basePath;
     this.baseDir = baseDir;
     this.https = this.groupingHttps();
@@ -56,13 +56,13 @@ export class HttpHandlersGeneratorWindows {
 
       files.forEach((file) => {
         const filePath = path.join(currentPath, file);
+        const convertFilePath = convertPath(filePath, "posix");
+        
         if (fs.statSync(filePath).isDirectory()) {
           traverseDirectory(filePath);
         } else {
           fileNames.push(
-            filePath
-              .replace(directoryPath.replace(/\//g, "\\"), "")
-              .replace("\\", "")
+            convertFilePath.replace(directoryPath.replace(/\.\//, ""), "")
           );
         }
       });
@@ -82,24 +82,18 @@ export class HttpHandlersGeneratorWindows {
     };
 
     for (const fileName of this.fileNames) {
-      const paths = fileName.split(/[\\/]/).filter((f) => f !== "");
-
+      const paths = fileName.split("/").filter((f) => f !== "");
       const httpMethod = paths[0];
-
       https[httpMethod]?.push({
-        path: path.join(this.basePath, paths.slice(1).join("/")),
-        dir: `.${path.sep}${this.baseDir.split(/[\\/]/).pop()}${fileName}`,
+        path: convertPath(path.join(this.basePath, paths.slice(1).join("/")), "posix"),
+        dir: convertPath(`.${path.sep}${this.baseDir.split("/").pop()}${fileName}`, "win32"),
       });
     }
-
+    
     return https;
   }
   private generatePath(path: string): string {
-    return path
-      .replace(".json", "")
-      .replace("/index", "")
-      .replace(/\*.+/, "*")
-      .replace(/\\/g, "/");
+    return path.replace(".json", "").replace("/index", "").replace(/\*.+/, "*");
   }
   private mappingHttpMethods(): string {
     let result = "";
@@ -133,23 +127,25 @@ export class HttpHandlersGeneratorWindows {
           const name = this.createSchemaName(
             item.path.replace(this.basePath, "")
           );
-          return `import ${name} from "${item.dir}"`;
+          const dir = convertPath(item.dir, "posix")
+          return `import ${name} from "${dir}"`;
         })
       )
       .join(";\n");
+      
     return result;
   }
   private createSchemaName(filePath: string) {
     let fileName = filePath
-      .replace(this.directoryPath.replace(/[\\/]/, ""), "")
+      .replace(this.directoryPath.replace("./", ""), "")
       .replace(".json", "")
-      .replace("*", "")
+      .replace("#", "")
       .replace("/index", "");
 
     // Convert kebab case to camelCase
     fileName = fileName.replace(/-([a-z])/g, (_, char) => char.toUpperCase());
 
-    const pathComponents = fileName.split(/[\\/]/);
+    const pathComponents = fileName.split("/");
 
     fileName = pathComponents
       .map((item, index) => {
@@ -167,7 +163,6 @@ export class HttpHandlersGeneratorWindows {
     result += "\n\n";
     result += this.importTemplate;
     result += this.mappingHttpMethods();
-
     result += this.handlersTemplate;
     return result;
   }

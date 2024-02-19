@@ -2,14 +2,27 @@ import { test, expect } from "vitest";
 import prettier from "prettier";
 import config from "../prettier";
 import { HttpHandlersGenerator } from "../handlers-generator";
+import { HttpHandlersGeneratorWindows } from "src/handlers-generator-windows";
+import os from "os";
 
 test("generator should create handlers based on specified file paths", async () => {
-  const generator = new HttpHandlersGenerator(
-    "src/examples/jsons",
-    "api",
-    "src/example/jsons",
-    "0"
-  );
+  let generator = null;
+
+  if (os.platform() === "win32") {
+    generator = new HttpHandlersGeneratorWindows(
+      "src/examples/jsons",
+      "api",
+      "src/example/jsons",
+      "0"
+    );
+  } else {
+     generator = new HttpHandlersGenerator(
+      "src/examples/jsons",
+      "api",
+      "src/example/jsons",
+      "0"
+    );
+  }
   const result = generator.generateHandlers();
   const expected = await prettier.format(
     `
