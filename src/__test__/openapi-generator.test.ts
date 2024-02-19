@@ -1,5 +1,3 @@
-// Copyright 1999-2024. Plesk International GmbH. All rights reserved.
-
 import { expect, test } from "vitest";
 import { OpenApiGenerator } from "../openapi-generator";
 
